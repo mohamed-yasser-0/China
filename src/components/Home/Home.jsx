@@ -25,14 +25,13 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import DownloadIcon from "@mui/icons-material/Download";
 import { AuthContext } from "../../context/settingContext";
 import ProfilePage from "../Profile/Page";
-import AlertDialog from "../navBar/bobab/Dialog";
+import AlertDialog from "../bobab/Dialog";
 
 export default function Home() {
-  const { daysData, setDaysData, postDays, dayes, setSnackbar, user } =
+  const { daysData, setDaysData, dayes, user } =
     React.useContext(AuthContext);
 
   const day = dayes.days?.[1];
-  console.log(dayes.days);
   const navigate = useNavigate();
 
   const [currentDay, setCurrentDay] = useState(1);
@@ -43,7 +42,6 @@ export default function Home() {
     localStorage.setItem("daysData", JSON.stringify(daysData));
   }, [daysData]);
 
-  console.log(daysData[1][0].date);
   const date = daysData[1][0].date;
   // useEffect(() => {
   //   if (dayes?.days) {
@@ -109,7 +107,6 @@ export default function Home() {
       return newData;
     });
   };
-
   const isAdmin = user?.role === "ADMIN";
   return (
     <Box

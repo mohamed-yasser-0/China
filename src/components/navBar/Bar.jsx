@@ -19,7 +19,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
 export default function Bar() {
-  const { logout, setSnackbar } = useContext(AuthContext);
+  const { logout, setSnackbar, user } = useContext(AuthContext);
 
   const handleLogout = () => {
     if (logout) logout();
@@ -38,63 +38,63 @@ export default function Bar() {
   };
 
   // ============== دالة التصدير إلى Excel ==============
-const exportToExcel = () => {
-  const storedData = localStorage.getItem("daysData");
+  const exportToExcel = () => {
+    const storedData = localStorage.getItem("daysData");
 
-  if (!storedData) {
-    alert("لا يوجد بيانات للتصدير");
-    return;
-  }
+    if (!storedData) {
+      alert("لا يوجد بيانات للتصدير");
+      return;
+    }
 
-  const parsedData = JSON.parse(storedData);
+    const parsedData = JSON.parse(storedData);
 
-  let exportData = [];
-  let counter = 1;
+    let exportData = [];
+    let counter = 1;
 
-  Object.keys(parsedData).forEach((dayKey) => {
-    parsedData[dayKey].forEach((day) => {
-      day.students.forEach((student) => {
-        const arabic = student.grades.arabic || 0;
-        const english = student.grades.english || 0;
-        const bonus = student.grades.bonus || 0;
-        const total = arabic + english + bonus;
+    Object.keys(parsedData).forEach((dayKey) => {
+      parsedData[dayKey].forEach((day) => {
+        day.students.forEach((student) => {
+          const arabic = student.grades.arabic || 0;
+          const english = student.grades.english || 0;
+          const bonus = student.grades.bonus || 0;
+          const total = arabic + english + bonus;
 
-        exportData.push({
-          "م": counter++,
-          "رقم الجلوس": student.studentId,
-          "اسم الطالب": student.name,
-          "تاريخ": day.date,
-          "درجة العربي": arabic,
-          "درجة الإنجليزي": english,
-          "البونص": bonus,
-          "الإجمالي": total,
+          exportData.push({
+            م: counter++,
+            "رقم الجلوس": student.studentId,
+            "اسم الطالب": student.name,
+            تاريخ: day.date,
+            "درجة العربي": arabic,
+            "درجة الإنجليزي": english,
+            البونص: bonus,
+            الإجمالي: total,
+          });
         });
       });
     });
-  });
 
-  // إنشاء ملف Excel
-  const ws = XLSX.utils.json_to_sheet(exportData);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "كشف الدرجات");
+    // إنشاء ملف Excel
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "كشف الدرجات");
 
-  const excelBuffer = XLSX.write(wb, {
-    bookType: "xlsx",
-    type: "array",
-  });
+    const excelBuffer = XLSX.write(wb, {
+      bookType: "xlsx",
+      type: "array",
+    });
 
-  const dataBlob = new Blob([excelBuffer], {
-    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  });
+    const dataBlob = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
 
-  saveAs(dataBlob, "كشف_درجات_الطلاب.xlsx");
+    saveAs(dataBlob, "كشف_درجات_الطلاب.xlsx");
 
-  setSnackbar({
-    open: true,
-    message: "تم تحميل الملف بنجاح",
-    severity: "success",
-  });
-};
+    setSnackbar({
+      open: true,
+      message: "تم تحميل الملف بنجاح",
+      severity: "success",
+    });
+  };
 
   return (
     <AppBar
@@ -111,17 +111,23 @@ const exportToExcel = () => {
     >
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Typography variant="h5" fontWeight="bold">
-          كشف درجات الطلاب
+          {user?.role === "ADMIN"?"درجات الطلاب":`مرحبأ ${user?.name}`}
         </Typography>
 
         <Box sx={{ display: "flex", gap: 1 }}>
-          <Tooltip title="تحديث البيانات">
+          <Tooltip
+            sx={{ display: user?.role === "ADMIN" ? "flex" : "none" }}
+            title="تحديث البيانات"
+          >
             <IconButton color="inherit" onClick={handleRefresh}>
               <RefreshIcon />
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="تحميل كـ Excel">
+          <Tooltip
+            sx={{ display: user?.role === "ADMIN" ? "flex" : "none" }}
+            title="تحميل كـ Excel"
+          >
             <IconButton color="inherit" onClick={exportToExcel}>
               <DownloadIcon />
             </IconButton>

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect} from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Box,
@@ -16,10 +16,10 @@ export default function Login() {
   const { loginUser, formData, setFormData, isLoggedIn, setTab, user } =
     useContext(AuthContext);
   const navigate = useNavigate();
-  console.log(user)
   useEffect(() => {
     if (isLoggedIn) {
       navigate("/home");
+      console.log(user);
     }
   }, [isLoggedIn]);
 
